@@ -7,6 +7,17 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '2', artifactNumToKeepStr: '1'))
     }
     stages {
+        stage('Test') {
+  	    steps {
+    	        echo 'Testing...'
+                sh 'mvn clean test'
+  	    }
+            post {
+                always {
+                    junit 'target/surefire-reports/*.xml'
+                }
+            }
+        }
         stage('Build') {
             steps {
     	      echo 'Building...'
@@ -18,14 +29,6 @@ pipeline {
               }
             }
   	}
-      stage('Test') {
-  	steps {
-    	    echo 'Updating test results'
-  	}
-        post {
-            junit 'target/surefire-reports/*.xml'
-        }
-      }
       stage('Deploy') {
   	steps {
     	    echo 'Deploying...'
